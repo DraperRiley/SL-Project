@@ -1,0 +1,6 @@
+/archive
+/archive.zip
+.idea/
+__pycache__/
+old/
+hw7.py
