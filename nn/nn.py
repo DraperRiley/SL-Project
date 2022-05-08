@@ -9,6 +9,7 @@ class Layer:
     def __init__(self, num_inputs, num_neurons):
         self.weights = 0.10 * np.random.randn(num_inputs, num_neurons)
         self.biases = np.zeros((1, num_neurons))
+        # self.biases = 0.10 * np.random.randn(1, num_neurons)
 
     def forward(self, inputs):
         self.output = np.dot(inputs, self.weights) + self.biases
@@ -73,7 +74,7 @@ def main():
     IMAGE_WIDTH = 28
     IMAGE_HEIGHT = 28
     INPUTS = IMAGE_WIDTH*IMAGE_HEIGHT
-    lr = 0.05
+    lr = 0.03
     iterations = 10000
 
     X = np.array([[1,0,0,0,0,0,0,0],
@@ -87,9 +88,10 @@ def main():
 
     X2 = np.array([[1,0,0,0,0,0,0,0]])
 
-    layer1 = Layer(8, 4)
-    test_layer = Layer(4, 4)
-    layer2 = Layer(4, 8)
+    layer1 = Layer(8, 10)
+    layer2 = Layer(10, 7)
+    layer3 = Layer(7, 10)
+    output_layer = Layer(10, 8)
 
     loss_function = Loss()
     back_prop = BackPropgation()
@@ -110,11 +112,14 @@ def main():
             layer1.forward(nn_input)
             layer1_out = layer1.relu(layer1.output)
 
-            test_layer.forward(layer1_out)
-            test_layer_out = test_layer.relu(test_layer.output)
+            layer2.forward(layer1_out)
+            layer2_out = layer2.relu(layer2.output)
 
-            layer2.forward(test_layer_out)
-            pred = layer2.sigmoid(layer2.output)
+            layer3.forward(layer2_out)
+            layer3_out = layer3.relu(layer3.output)
+
+            output_layer.forward(layer3_out)
+            pred = output_layer.sigmoid(output_layer.output)
 
             # class_targets = [0,1,2,3,4,5,6,7] We will stick to one-hot encoding
             loss_sum += loss_function.cumulative_loss(nn_input, pred)
@@ -129,9 +134,9 @@ def main():
             layer2.biases += lr * delta_k
             '''
 
-            delta_w, bias_update, delta_k = back_prop.update_output(lr, layer2, pred, nn_input, test_layer_out)
-            layer2.weights += delta_w
-            layer2.biases += bias_update
+            delta_w, bias_update, delta_k = back_prop.update_output(lr, output_layer, pred, nn_input, layer3_out)
+            output_layer.weights += delta_w
+            output_layer.biases += bias_update
 
             # Backpropagation for the hidden layer NOTE: hidden layer uses ReLU
             '''
@@ -148,11 +153,15 @@ def main():
             layer1.biases += lr * delta_j
             '''
 
-            delta_w, bias_update, delta_j = back_prop.update_hidden(lr, test_layer, layer2, delta_k, layer1_out)
-            test_layer.weights += delta_w
-            test_layer.biases += bias_update
+            delta_w, bias_update, delta_j = back_prop.update_hidden(lr, layer3, output_layer, delta_k, layer2_out)
+            layer3.weights += delta_w
+            layer3.biases += bias_update
 
-            delta_w, bias_update, delta_j = back_prop.update_hidden(lr, layer1, test_layer, delta_j, nn_input)
+            delta_w, bias_update, delta_j = back_prop.update_hidden(lr, layer2, layer3, delta_j, layer1_out)
+            layer2.weights += delta_w
+            layer2.biases += bias_update
+
+            delta_w, bias_update, delta_j = back_prop.update_hidden(lr, layer1, layer2, delta_j, nn_input)
             layer1.weights += delta_w
             layer1.biases += bias_update
 
@@ -167,14 +176,16 @@ def main():
     layer1.forward(X)
     layer1_out = layer1.relu(layer1.output)
 
-    test_layer.forward(layer1_out)
-    test_layer_out = test_layer.relu(test_layer.output)
+    layer2.forward(layer1_out)
+    layer2_out = layer2.relu(layer2.output)
 
-    layer2.forward(test_layer_out)
-    pred = layer2.sigmoid(layer2.output)
+    layer3.forward(layer2_out)
+    layer3_out = layer3.relu(layer3.output)
+
+    output_layer.forward(layer3_out)
+    pred = output_layer.sigmoid(output_layer.output)
 
     print(np.argmax(pred, axis=1))
-
 
     return 0
 
