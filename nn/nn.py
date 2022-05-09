@@ -74,7 +74,7 @@ def main():
     IMAGE_WIDTH = 28
     IMAGE_HEIGHT = 28
     INPUTS = IMAGE_WIDTH*IMAGE_HEIGHT
-    lr = 0.03
+    lr = 0.01
     iterations = 10000
 
     X = np.array([[1,0,0,0,0,0,0,0],
