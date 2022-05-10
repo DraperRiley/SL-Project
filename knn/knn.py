@@ -113,4 +113,14 @@ def get_distance(arr1, arr2):
     return result
 
 if __name__ == '__main__':
-    main()
+    x_val = ['k=3', 'k=5', 'k=7', 'k=9']
+    y_val = [0.5099009900990099, 0.5198019801980198, 0.5, 0.5396039603960396]
+    colors = ['green', 'blue', 'red', 'teal']
+    plt.bar(x_val, y_val, color=colors)
+    plt.title('Performance of K Near. Neigh.')
+    plt.xlabel('Value of K')
+    plt.ylabel('Accuracy')
+    plt.grid(True)
+    plt.savefig('knn_performance.jpg')
+
+    # main()
