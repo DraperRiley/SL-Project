@@ -7,15 +7,15 @@ IMAGE_WIDTH = 30
 IMAGE_HEIGHT = 30
 INPUTS = IMAGE_WIDTH*IMAGE_HEIGHT
 layer1 = nn.Layer(INPUTS, 522)
-# layer2 = nn.Layer(10, 522)
+layer2 = nn.Layer(522, 522)
 output_layer = nn.Layer(522, 2)
 
 def main():
 
     DOG_PATH = '../archive/training_set/training_set/dogs/dog.{f}.jpg'
     CAT_PATH = '../archive/training_set/training_set/cats/cat.{f}.jpg'
-    lr = 0.0005
-    iterations = 200
+    lr = 0.0001
+    iterations = 100
     dog = [[1, 0]]
     cat = [[0, 1]]
     target = None
@@ -61,23 +61,23 @@ def main():
             layer1.forward(X)
             layer1_out = layer1.relu(layer1.output)
 
-            # layer2.forward(layer1_out)
-            # layer2_out = layer2.relu(layer2.output)
+            layer2.forward(layer1_out)
+            layer2_out = layer2.relu(layer2.output)
 
-            output_layer.forward(layer1_out)
+            output_layer.forward(layer2_out)
             pred = output_layer.sigmoid(output_layer.output)
 
             loss_sum += loss_function.cumulative_loss(target, pred)
 
-            delta_w, bias_update, delta_k = backpropagation.update_output(lr, output_layer, pred, target, layer1_out)
+            delta_w, bias_update, delta_k = backpropagation.update_output(lr, output_layer, pred, target, layer2_out)
             output_layer.weights += delta_w
             output_layer.biases += bias_update
 
-            #delta_w, bias_update, delta_j = backpropagation.update_hidden(lr, layer2, output_layer, delta_k, layer1_out)
-            #layer2.weights += delta_w
-            #layer2.biases += bias_update
+            delta_w, bias_update, delta_j = backpropagation.update_hidden(lr, layer2, output_layer, delta_k, layer1_out)
+            layer2.weights += delta_w
+            layer2.biases += bias_update
 
-            delta_w, bias_update, delta_j = backpropagation.update_hidden(lr, layer1, output_layer, delta_k, X)
+            delta_w, bias_update, delta_j = backpropagation.update_hidden(lr, layer1, layer2, delta_j, X)
             layer1.weights += delta_w
             layer1.biases += bias_update
 
@@ -89,28 +89,39 @@ def main():
         acc.append(accuracy)
         print('Iteration: {f}, Test acc: {g}'.format(f=i, g=accuracy))
 
-    plt.plot(x_val, loss, label='Loss')
+    npy_loss = np.array(loss) / np.sum(loss)
+    np_x_val = np.array(x_val)
+    np_acc = np.array(acc)
+
+    plt.plot(np_x_val, npy_loss, label='Loss')
+    plt.plot(np_x_val, np_acc, label='Test Accuracy')
     plt.legend()
     plt.xlabel('Iteration')
-    plt.ylabel('Loss')
+    plt.ylabel('Loss/Accuracy')
     plt.title('NN Performance')
     plt.savefig('Loss_{f}_iter_{g}_lr.png'.format(f=iterations, g=lr))
 
+    np.save('npy_loss_522_522_2.npy', npy_loss)
+    np.save('npy_acc_522_522_2.npy', np_acc)
+    np.save('np_x_val.npy', np_x_val)
+
+    '''
     plt.plot(x_val, acc, label='Test Accuracy')
     plt.legend()
     plt.xlabel('Iteration')
     plt.ylabel('Accuracy')
     plt.title('NN Accuracy Over Test Data')
     plt.savefig('Acc_{f}_iter_{g}_lr.png'.format(f=iterations, g=lr))
+    '''
 
-    np.save('layer1_weights.npy', layer1.weights)
-    np.save('layer1_biases.npy', layer1.biases)
+    # np.save('layer1_weights.npy', layer1.weights)
+    # np.save('layer1_biases.npy', layer1.biases)
 
     # np.save('layer2_weights.npy', layer2.weights)
     # np.save('layer2_biases.npy', layer2.biases)
 
-    np.save('output_layer_weights.npy', output_layer.weights)
-    np.save('output_layer_biases.npy', output_layer.biases)
+    # np.save('output_layer_weights.npy', output_layer.weights)
+    # np.save('output_layer_biases.npy', output_layer.biases)
 
     img = preprocessor.process_image('../archive/test_set/test_set/dogs/dog.4001.jpg')
     X = np.array(img).flatten() / 255
@@ -118,10 +129,10 @@ def main():
     layer1.forward(X)
     layer1_out = layer1.relu(layer1.output)
 
-    # layer2.forward(layer1_out)
-    # layer2_out = layer2.relu(layer2.output)
+    layer2.forward(layer1_out)
+    layer2_out = layer2.relu(layer2.output)
 
-    output_layer.forward(layer1_out)
+    output_layer.forward(layer2_out)
     pred = output_layer.sigmoid(output_layer.output)
 
     print(pred, 'Image was a dog')
@@ -154,7 +165,10 @@ def test_acc():
         layer1.forward(X)
         layer1_out = layer1.relu(layer1.output)
 
-        output_layer.forward(layer1_out)
+        layer2.forward(layer1_out)
+        layer2_out = layer2.relu(layer2.output)
+
+        output_layer.forward(layer2_out)
         pred = output_layer.sigmoid(output_layer.output)
 
         arg_pred = np.argmax(pred)
@@ -174,7 +188,10 @@ def test_acc():
         layer1.forward(X)
         layer1_out = layer1.relu(layer1.output)
 
-        output_layer.forward(layer1_out)
+        layer2.forward(layer1_out)
+        layer2_out = layer2.relu(layer2.output)
+
+        output_layer.forward(layer2_out)
         pred = output_layer.sigmoid(output_layer.output)
 
         arg_pred = np.argmax(pred)
@@ -192,4 +209,23 @@ def test_acc():
 
 
 if __name__ == '__main__':
-    main()
+
+    model1_acc = np.load('npy_acc_522_2.npy')
+    model2_acc = np.load('npy_acc_522_522_2.npy')
+    x_val = np.load('np_x_val.npy')
+
+    plt.plot(x_val, model1_acc, label='Model 1')
+    plt.plot(x_val, model2_acc, label='Model 2')
+    plt.legend()
+    plt.title('NN Performance')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.savefig('NN_performance_acc_compare.jpg')
+
+    model1_avg = np.mean(model1_acc)
+    model2_avg = np.mean(model2_acc)
+
+    print('Model 1 mean: {f}'.format(f=model1_avg))
+    print('Model 2 mean: {f}'.format(f=model2_avg))
+
+    # main()
