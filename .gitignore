@@ -5,3 +5,7 @@ __pycache__/
 old/
 hw7.py
 *.npy
+test_slp.py
+single_layer_perceptron.py
+logistic_regression.py
+hw7.py

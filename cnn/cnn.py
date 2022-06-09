@@ -10,7 +10,6 @@ IMAGE_HEIGHT = 32
 def main():
 
     class_names = ['cat', 'dog']
-
     train_images = np.load('train_data_processed.npy')
     train_labels = np.load('train_label_processed.npy')
     test_images = np.load('test_data_processed.npy')
