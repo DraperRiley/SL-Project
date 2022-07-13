@@ -4,19 +4,27 @@ from tensorflow.keras import datasets, layers, models
 import matplotlib.pyplot as plt
 import preprocess
 
+# Image height and width
 IMAGE_WIDTH = 32
 IMAGE_HEIGHT = 32
 
 def main():
 
-    class_names = ['cat', 'dog']
+    # This network uses the architecture described in the Tensorflow documentation:
+    # https://www.tensorflow.org/tutorials/images/cnn
+
+    # class_names = ['cat', 'dog']
+
+    # Loading preprocessed images (grayscaled images)
     train_images = np.load('train_data_processed.npy')
     train_labels = np.load('train_label_processed.npy')
     test_images = np.load('test_data_processed.npy')
     test_labels = np.load('test_label_processed.npy')
 
+    # Normalizing image data
     train_images, test_images = train_images / 255.0, test_images / 255.0
 
+    # Creating convolution and pooling layers
     model = models.Sequential()
     model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)))
     model.add(layers.MaxPooling2D((2, 2)))
@@ -24,19 +32,23 @@ def main():
     model.add(layers.MaxPooling2D((2, 2)))
     model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 
-    model.summary()
+    # model.summary()
 
+    # Flatten into fully connected layer
     model.add(layers.Flatten())
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(10))
 
+    # Compile model
     model.compile(optimizer='adam',
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   metrics=['accuracy'])
 
+    # Keep track of models progress
     history = model.fit(train_images, train_labels, epochs=50,
                     validation_data=(test_images, test_labels))
 
+    # Plot progress
     plt.plot(history.history['accuracy'], label='accuracy')
     plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
     plt.xlabel('Epoch')
@@ -46,6 +58,7 @@ def main():
     plt.legend(loc='lower right')
     plt.savefig('cnn_performance')
 
+    # Evaluate model
     test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 
     print(test_acc)
@@ -54,6 +67,9 @@ def main():
 
 
 def create_data():
+
+    # Function for data preprocessing
+
     preprocessor = preprocess.Preprocess(IMAGE_WIDTH, IMAGE_HEIGHT, gray_scale=False)
     cat_index = 1
     dog_index = 1

@@ -9,3 +9,8 @@ test_slp.py
 single_layer_perceptron.py
 logistic_regression.py
 hw7.py
+nn/100iter_lr0.0005
+nn/200iter_lr0.0005
+nn/Loss_100_iter_0.0001_lr.png
+nn/Loss_10_iter_0.0005_lr.png
+nn/Loss_100_iter_0.0005_lr.png
