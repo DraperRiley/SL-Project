@@ -24,3 +24,16 @@ The results are described below:
 ![ANN](/nn/NN_performance_acc_compare.jpg)
 
 It was hypothesized that Model 1 would have a higher mean accuracy than Model 2.
+However, Model 1 achieved a mean accuracy of 56.4995%, and Model 2 an accuracy of 57.218%.
+
+## CNN
+
+Using Tensorflow, a Convolutional Neural Network was trained. CNNs succeed in image classification
+due to their ability to maintain the context of the image, whereas ANNs used flattened pixel data.
+The architecture used for the CNN is described [here](https://www.tensorflow.org/tutorials/images/cnn).
+The results for the CNN are described below:
+
+![CNN](/cnn/cnn_performance.png)
+
+We can see that the CNN achieves much higher accuracy over the test_data than both KNN and ANNs. As CNNs are data hungry models, with more images
+an even higher accuracy can surely be achieved.
