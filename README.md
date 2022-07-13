@@ -37,3 +37,9 @@ The results for the CNN are described below:
 
 We can see that the CNN achieves much higher accuracy over the test_data than both KNN and ANNs. As CNNs are data hungry models, with more images
 an even higher accuracy can surely be achieved.
+
+## Conclusion
+
+Due the high non-linearity of images, it was expected that both KNN and ANNs would
+severely underperform comparedn to CNNs. In the future I would like to see how other more
+complex models such as Support Vector Machines are able to handle this problem.
