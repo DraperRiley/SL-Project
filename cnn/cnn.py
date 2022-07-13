@@ -69,25 +69,35 @@ def main():
 def create_data():
 
     # Function for data preprocessing
+    # NOTE: Images are not randomly sorted as data independence is assumed
 
+    # Initialize preprocessor
     preprocessor = preprocess.Preprocess(IMAGE_WIDTH, IMAGE_HEIGHT, gray_scale=False)
+
+    # Set indices for iterating through images
     cat_index = 1
     dog_index = 1
+
+    # Image paths
     CAT_TRAIN_PATH = '../archive/training_set/training_set/cats/cat.{f}.jpg'
     DOG_TRAIN_PATH = '../archive/training_set/training_set/dogs/dog.{f}.jpg'
     CAT_TEST_PATH = '../archive/test_set/test_set/cats/cat.{f}.jpg'
     DOG_TEST_PATH = '../archive/test_set/test_set/dogs/dog.{f}.jpg'
 
+
+    # initialize training data numpy arrays
     img = preprocessor.process_image(CAT_TRAIN_PATH.format(f=cat_index))
     train_data = np.array([img])
     cat_index += 1
     train_label = np.array([[0]])
 
+    # append image and labels
     img = preprocessor.process_image(DOG_TRAIN_PATH.format(f=dog_index))
     train_data = np.append(train_data, [img], axis=0)
     dog_index += 1
     train_label = np.append(train_label, [[1]], axis=0)
 
+    # iterate through cat images and append image data and labels to arrays
     while cat_index <= 1000:
         img = preprocessor.process_image(CAT_TRAIN_PATH.format(f=cat_index))
         train_data = np.append(train_data, [img], axis=0)
@@ -99,16 +109,19 @@ def create_data():
 
         cat_index += 1
 
+    # initialize arrays for validation data
     cat_index = 4001
     img = preprocessor.process_image(CAT_TEST_PATH.format(f=cat_index))
     test_data = np.array([img])
     test_label = np.array([[0]])
 
+    # append image and label
     img = preprocessor.process_image(DOG_TEST_PATH.format(f=cat_index))
     test_data = np.append(test_data, [img], axis=0)
     test_label = np.append(test_label, [[1]], axis=0)
     cat_index += 1
 
+    # iterate through validation images
     while cat_index <= 5000:
         img = preprocessor.process_image(CAT_TEST_PATH.format(f=cat_index))
         test_data = np.append(test_data, [img], axis=0)
@@ -120,6 +133,7 @@ def create_data():
 
         cat_index += 1
 
+    # Save data as .npy files for later use
     np.save('train_data_processed.npy', train_data)
     np.save('train_label_processed.npy', train_label)
     np.save('test_data_processed.npy', test_data)
